@@ -1,0 +1,1 @@
+# Creating a CI/CD pipeline with FirecREST
