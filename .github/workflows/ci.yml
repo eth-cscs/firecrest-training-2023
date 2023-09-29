@@ -38,8 +38,8 @@ jobs:
 
       - name: Run testing script
         env:
-          FIRECREST_CLIENT_ID: ${{ secrets.FC_CLIENT_ID }}
-          FIRECREST_CLIENT_SECRET: ${{ secrets.FC_CLIENT_SECRET }}
-          FIRECREST_URL: ${{ secrets.FC_URL }}
-          AUTH_TOKEN_URL: ${{ secrets.FC_TOKEN_URL }}
+          FIRECREST_CLIENT_ID: ${{ secrets.F7T_CLIENT_ID }}
+          FIRECREST_CLIENT_SECRET: ${{ secrets.F7T_CLIENT_SECRET }}
+          FIRECREST_URL: ${{ secrets.F7T_URL }}
+          AUTH_TOKEN_URL: ${{ secrets.F7T_TOKEN_URL }}
         run: python use-case-CI-pipeline/ci/ci_script.py --system=${{ matrix.system_name }} --branch=${{ github.ref_name }} --repo=${{ github.server_url }}/${{ github.repository }}.git --account=class08
