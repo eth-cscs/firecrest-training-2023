@@ -14,7 +14,8 @@ class DevConfig(Config):
     FIRECREST_URL='https://firecrest.cscs.ch'
     SYSTEM_NAME='daint'
     SYSTEM_PARTITIONS=['normal']
-    USER_GROUP=''
+    SYSTEM_RESERVATION=['firecrest_api']
+    USER_GROUP='class08'
     SYSTEM_CONSTRAINTS=['gpu']
     SYSTEM_BASE_DIR = '/scratch/snx3000'
     PROBLEM_SUBDIR = "f7t_training"

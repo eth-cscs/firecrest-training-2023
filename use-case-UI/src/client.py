@@ -96,9 +96,9 @@ def list_files_with_f7t(system_name: str, target_path: str) -> list:
 
 
 
-def get_username(system_name):
+def get_username_with_f7t(system_name):
     '''
-        - Name: `get_username`
+        - Name: `get_username_with_f7t`
         - Description:
         This function should return the username of the current OIDC credential owner
         Returns None if the username is not found
@@ -114,13 +114,13 @@ def get_systems_with_f7t() -> dict:
     '''
         - Name: `get_systems_with_f7t`
         - Description This function should return a python dictionary of
-        `{"system_name":"system_base_dir" }`
+        `{"system_name":"system_base_dir" }` being `system_base_dir` the `mounted` filesystem for the `system_name`
         - Params:
           - `None`
         - Returns:
           - `dict`
     '''
-    sys_avail = {} # {"system_name":"system_baswe_dir" }
+    sys_avail = {} # {"system_name":"system_base_dir" }
 
     return sys_avail
 
@@ -162,7 +162,7 @@ def mkdir_with_f7t(system_name: str, target_path: str) -> bool:
 
 def mkdir(jobName):
 
-    username = get_username()
+    username = get_username_with_f7t(SYSTEM_NAME)
     if username == None:
         return {"error": 1, "msg":f"Error creating directory: couldn't get username"}
 
@@ -476,7 +476,7 @@ def submit_job():
     # if isPostProcess, then the directory /post is attached to JobName
     jobTemplate = SBATCH_TEMPLATE
 
-    username = get_username()
+    username = get_username_with_f7t(SYSTEM_NAME)
     if username == None:
         return jsonify(data=f"Error at getting username"), 400
 
@@ -535,7 +535,7 @@ def submit_job():
 
 @app.before_request
 def before_request():
-    g.user = get_username()
+    g.user = get_username_with_f7t(SYSTEM_NAME)
 
 
 @app.route("/",methods=["GET","POST"])
