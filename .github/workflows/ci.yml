@@ -34,7 +34,7 @@ jobs:
       - name: install python packages
         run: |
           python -m pip install --upgrade pip
-          pip install -r ci-requirements.txt
+          pip install -r use-case-CI_pipeline/ci-requirements.txt
 
       - name: Run testing script
         env:
@@ -42,5 +42,5 @@ jobs:
           FIRECREST_CLIENT_SECRET: ${{ secrets.FC_CLIENT_SECRET }}
           FIRECREST_URL: ${{ secrets.FC_URL }}
           AUTH_TOKEN_URL: ${{ secrets.FC_TOKEN_URL }}
-        run: python ci/ci_script.py --system=${{ matrix.system_name }} --branch=${{ github.ref_name }} --repo=${{ github.server_url }}/${{ github.repository }}.git --account=class08
+        run: python use-case-CI_pipeline/ci/ci_script.py --system=${{ matrix.system_name }} --branch=${{ github.ref_name }} --repo=${{ github.server_url }}/${{ github.repository }}.git --account=class08
 
