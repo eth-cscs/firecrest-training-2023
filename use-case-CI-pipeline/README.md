@@ -3,7 +3,7 @@
 ## Goal of the excercise
 
 Create a CI/CD pipeline that will run in Piz daint.
-In the repository you can find the code that is tested, in the `dist` folder and the pipeline is mostly set up so you will only need to fill the parts that will submit the job in the supercomputer and the processing of the results.
+In the repository you can find the code that is tested and the pipeline is mostly set up so you will only need to fill the parts that will submit the job in the supercomputer and the processing of the results.
 
 ## Prerequisites
 
@@ -23,7 +23,7 @@ Even if you have experience with another programming language, you'll likely fin
 
         ```bash
         git clone https://github.com/your-username/your-repository.git
-        cd <your-repository>
+        cd your-repository
         ```
     - The workflows will be disabled by default in your repo so go ahead and enable them in the "Actions" tab of your repository.
 
