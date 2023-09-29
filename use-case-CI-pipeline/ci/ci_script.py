@@ -17,6 +17,9 @@ final_slurm_states = {
     'TIMEOUT',
 }
 
+# If you are working on the CI-pipeline use case remove the line bellow:
+exit(0)
+
 # Setup variables of the client as secrets
 CLIENT_ID = os.environ.get("FIRECREST_CLIENT_ID")
 CLIENT_SECRET = os.environ.get("FIRECREST_CLIENT_SECRET")
