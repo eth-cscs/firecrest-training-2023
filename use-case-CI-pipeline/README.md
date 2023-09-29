@@ -38,7 +38,8 @@ Even if you have experience with another programming language, you'll likely fin
     - Open the CI configuration file (`.github/workflows/ci.yml`) and, with the help of the comments, try to understand the different steps that are already configured.
     - Find out the secrets that are used in the pipeline and try to figure out how to set them up in your account.
     - You will need to make changes in the file `.ci/ci_script.py`.
-    Follow the instructions of the commented sections.
+    Remove the premature exit line (this will make the CI fail) and try to fix the script by following the instructions of the commented sections.
+    You can use pyfirecrest to try to solve the problem or direct requests to the API.
 
 1. **Review Results:**
     Once you've configured the pipeline, commit your changes and push them to your GitHub repository.

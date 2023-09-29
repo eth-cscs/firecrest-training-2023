@@ -5,6 +5,7 @@ import argparse
 import utilities as util
 
 
+# You can use this set to decide if the job has finished
 final_slurm_states = {
     'BOOT_FAIL',
     'CANCELLED',
@@ -20,18 +21,20 @@ final_slurm_states = {
 # If you are working on the CI-pipeline use case remove the line bellow:
 exit(0)
 
-# Setup variables of the client as secrets
+# Setup variables of the client as secrets,
+# no need to change anything here
 CLIENT_ID = os.environ.get("FIRECREST_CLIENT_ID")
 CLIENT_SECRET = os.environ.get("FIRECREST_CLIENT_SECRET")
 FIRECREST_URL = os.environ.get("FIRECREST_URL")
 AUTH_TOKEN_URL = os.environ.get("AUTH_TOKEN_URL")
 
+# Setup an argument parser for the script,
+# no need to change anything here
 parser = argparse.ArgumentParser()
 parser.add_argument("--system", default=os.environ.get('MACHINE'), help="choose system to run")
 parser.add_argument("--branch", default="main", help="branch to be tested")
 parser.add_argument("--account", default="csstaff", help="branch to be tested")
 parser.add_argument("--repo", help="repository to be tested")
-
 args = parser.parse_args()
 system_name = args.system
 ref = args.branch
@@ -45,23 +48,21 @@ script_content = util.create_batch_script(repo=args.repo, constraint='gpu', num_
 with open("submission_script.sh", "w") as fp:
     fp.write(script_content)
 
-# check the status of the system and print it in the console
+# Check the status of the system and print it in the console
 
-# if the status is available submit and poll every 30 secs until
+# If the status is available submit and poll every 30 secs until
 # it reaches a final state
-
 if status == "available":
     pass
 
-
-    # print the filename of stdout and stderr in the console
+    # Print the filename of stdout and stderr in the console,
     # as well as their content
 
 
     # Add some sanity checks:
-    # poll for the final result of the system and make sure it "COMPLETED"
-    # check the output with the util function
+    # - Poll for the final result of the system and make sure it "COMPLETED"
 
+    # Check the output with the util function that is provided
     # util.check_output(stdout_content)
 
 else:
