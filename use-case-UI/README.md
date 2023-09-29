@@ -3,7 +3,7 @@
 ## Prerequisites
 
 - Training account (from CSCS)
-- Create FirecREST API Keys using [OIDC Dashboard](https://oidc-dashboard.cscs.ch)
+- Create FirecREST API Keys using [OIDC Dashboard](https://oidc-dashboard-prod.cscs.ch)
 
 - Docker installed
 - Knowledge of Python
