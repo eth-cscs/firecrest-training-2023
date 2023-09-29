@@ -1,0 +1,34 @@
+#!/bin/bash -l
+#SBATCH --job-name={{ jobName }}
+#SBATCH --time=00:10:00
+#SBATCH --nodes={{ ntasks }}
+#SBATCH --partition={{ partition }}
+#SBATCH --constraint={{ constraint }}
+#SBATCH --account={{ account }}
+{% if step != 1 %}
+{# if step is 1, then no dependency should be added #}
+#SBATCH --dependency=afterok:{{ lastJobId }}
+{% endif %}
+module load daint-gpu
+module load sarus
+
+step={{ step }}
+cd {{ jobDir }}
+
+ini=cylinder_${step}.ini
+
+let p=step-1
+sed -e 's#TSTART#tstart = '${p}.0'#' -e 's#TEND#tend = '${step}.1'#' < cylinder_base.ini > $ini
+
+if [ $step -eq 1 ]; then
+   command="run"
+   prev=""
+ else
+   # there's a previous solution
+   command="restart"
+   prev=" solution.pyfrs "
+fi
+
+
+sarus run --mount=type=bind,src=$(pwd),dst=/pyfr --workdir=/pyfr ethcscs/pyfr:1.12.0-cuda11.3-mpich3.1.4-ubuntu20.04 pyfr $command -b cuda -p inc_cylinder_2d.pyfrm ${prev} $ini
+cp --force out_${step}.00.pyfrs solution.pyfrs
