@@ -1,8 +1,8 @@
 # Creating a CI/CD pipeline with FirecREST
 
-## Goal of the excercise
+## Goal of the exercise
 
-Create a CI/CD pipeline that will run in Piz daint.
+Create a CI/CD pipeline that will run in Piz Daint.
 In the repository you can find the code that is tested and the pipeline is mostly set up so you will only need to fill the parts that will submit the job in the supercomputer and the processing of the results.
 
 ## Prerequisites
