@@ -7,6 +7,9 @@
 #SBATCH --partition={{ partition }}
 #SBATCH --account={{ account }}
 #SBATCH --constraint={{ constraint }}
+{% if not none(reservation) %}
+#SBATCH --reservation={{ reservation }}
+{% endif %}
 
 {% if step != 1 %}
 {# if step is 1, then no dependency should be added #}

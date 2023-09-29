@@ -55,6 +55,7 @@ try:
     SYSTEM_NAME = app.config["SYSTEM_NAME"]
     SYSTEM_PARTITIONS = app.config["SYSTEM_PARTITIONS"]
     SYSTEM_CONSTRAINTS = app.config["SYSTEM_CONSTRAINTS"]
+    SYSTEM_RESERVATION = app.config["SYSTEM_RESERVATION"]
     SYSTEM_BASE_DIR = app.config["SYSTEM_BASE_DIR"]
     USER_GROUP = app.config["USER_GROUP"]
 
@@ -261,7 +262,7 @@ def results():
 
 
 def write_sbatch(jobTemplate, jobName="f7t_test", ntasks=1, account=None, partition=None,
-                constraint=None,jobDir=None,step=1,lastJobId=None):
+                constraint=None,reservation=None,jobDir=None,step=1,lastJobId=None):
 
     try:
         # sbatch templates directory
@@ -300,8 +301,8 @@ def write_sbatch(jobTemplate, jobName="f7t_test", ntasks=1, account=None, partit
         with open(sbatch_file_path, "w") as sf:
             # replace templates variables with values
             sf.write(jinja_template.render(jobName=jobName, partition=partition, account=account,
-                                     constraint=constraint, lastJobId=lastJobId, ntasks=ntasks,
-                                     step=step, jobDir=jobDir))
+                                     constraint=constraint, reservation=reservation, lastJobId=lastJobId, 
+                                     ntasks=ntasks, step=step, jobDir=jobDir))
 
         if DEBUG:
             app.logger.info(f"Created file: {sbatch_file_path}")
@@ -323,7 +324,7 @@ def write_sbatch(jobTemplate, jobName="f7t_test", ntasks=1, account=None, partit
 
 
 
-def background_submit_task(steps,jobTemplate,jobName,ntasks,partition,constraint,targetPath, isPostProcess):
+def background_submit_task(steps,jobTemplate,jobName,ntasks,partition,constraint,reservation,targetPath, isPostProcess):
 
     global JOB_LIST
     global POST_JOB_ID
@@ -339,7 +340,7 @@ def background_submit_task(steps,jobTemplate,jobName,ntasks,partition,constraint
                 # write sbatch file using the jobTemplate
 
                 res = write_sbatch(jobTemplate=jobTemplate, jobName=f"{jobName}_{step}",ntasks=ntasks,account=USER_GROUP, partition=partition,
-                        constraint=constraint, jobDir=targetPath,step=step)
+                        constraint=constraint, reservation=reservation, jobDir=targetPath,step=step)
             except Exception as e:
                 app.logger.error(e)
 
@@ -351,7 +352,7 @@ def background_submit_task(steps,jobTemplate,jobName,ntasks,partition,constraint
             # step is not the first one
             try:
                 res = write_sbatch(jobTemplate=jobTemplate,jobName=f"{jobName}_{step}", ntasks=1, account=USER_GROUP, partition=partition,
-                            constraint=constraint, jobDir=targetPath,step=step,lastJobId=lastJobId )
+                            constraint=constraint, reservation=reservation, jobDir=targetPath,step=step,lastJobId=lastJobId )
             except Exception as e:
                 app.logger.error(e)
 
@@ -511,7 +512,9 @@ def submit_job():
                 return jsonify(data="Error copying initial data"), 400
 
 
-    bgtask = threading.Thread(target=background_submit_task,args=(steps,jobTemplate,jobName,ntasks,partition,constraint,targetPath,isPostProcess))
+    bgtask = threading.Thread(target=background_submit_task,
+                              args=(steps,jobTemplate,jobName,ntasks,partition,constraint,SYSTEM_RESERVATION,targetPath,
+                                    isPostProcess))
 
     bgtask.start()
 
@@ -536,6 +539,7 @@ def submit_job():
 @app.before_request
 def before_request():
     g.user = get_username_with_f7t(SYSTEM_NAME)
+    app.logger.debug(g.user)
 
 
 @app.route("/",methods=["GET","POST"])

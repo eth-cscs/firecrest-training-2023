@@ -6,6 +6,9 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --partition={{ partition }}
 #SBATCH --constraint={{ constraint }}
+{% if not none(reservation) %}
+#SBATCH --reservation={{ reservation }}
+{% endif %}
 
 module load sarus daint-gpu ParaView
 

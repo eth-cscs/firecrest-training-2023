@@ -5,6 +5,11 @@
 #SBATCH --partition={{ partition }}
 #SBATCH --constraint={{ constraint }}
 #SBATCH --account={{ account }}
+{% if not none(reservation) %}
+#SBATCH --reservation={{ reservation }}
+{% endif %}
+
+
 {% if step != 1 %}
 {# if step is 1, then no dependency should be added #}
 #SBATCH --dependency=afterok:{{ lastJobId }}
