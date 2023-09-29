@@ -24,12 +24,12 @@ from config import DevConfig
 def create_app():
     app = Flask(__name__)
     app.config.from_object(DevConfig)
-    
+
     Session(app)
 
     # to have continue, break statements in jinja
     app.jinja_env.add_extension('jinja2.ext.loopcontrols')
-    
+
     return app
 
 
@@ -49,7 +49,7 @@ try:
     OIDC_AUTH_REALM = app.config["OIDC_AUTH_REALM"]
     OIDC_AUTH_BASE_URL = app.config["OIDC_AUTH_BASE_URL"]
 
-    OIDC_AUTH_WEB_ISSUER_URL = f"{OIDC_AUTH_BASE_URL}/auth/realms/{OIDC_AUTH_REALM}" 
+    OIDC_AUTH_WEB_ISSUER_URL = f"{OIDC_AUTH_BASE_URL}/auth/realms/{OIDC_AUTH_REALM}"
     OIDC_AUTH_TOKEN_URL = f"{OIDC_AUTH_WEB_ISSUER_URL}/protocol/openid-connect/token"
 
     SYSTEM_NAME = app.config["SYSTEM_NAME"]
@@ -57,13 +57,13 @@ try:
     SYSTEM_CONSTRAINTS = app.config["SYSTEM_CONSTRAINTS"]
     SYSTEM_BASE_DIR = app.config["SYSTEM_BASE_DIR"]
     USER_GROUP = app.config["USER_GROUP"]
-    
-    
+
+
     PROBLEM_SUBDIR = app.config["PROBLEM_SUBDIR"]
     PROBLEM_FILES = app.config["PROBLEM_FILES"]
     SBATCH_TEMPLATE = app.config["SBATCH_TEMPLATE"]
     POST_TEMPLATE = app.config["POST_TEMPLATE"]
-    
+
 except KeyError as ke:
     app.logger.error(f"Error in configuration file: {ke}")
 
@@ -82,38 +82,38 @@ f7t_client = f7t.Firecrest(
 def list_files_with_f7t(system_name: str, target_path: str) -> list:
     '''
         - Name: `list_files_dir`
-        - Description: 
+        - Description:
            This function should return a list of files on `target_path` on the `system_name`.
             In case of error, it should return None
         - Params:
           - `system_name`: str
           - `target_path`: str
-        - Returns: 
+        - Returns:
           - `list` | `None`
     '''
 
     return None
 
-       
+
 
 def get_username(system_name):
     '''
         - Name: `get_username`
-        - Description: 
+        - Description:
         This function should return the username of the current OIDC credential owner
         Returns None if the username is not found
         - Params:
           - `system_name`: str
-        - Returns: 
+        - Returns:
           - str|None
     '''
 
     return None
-    
+
 def get_systems_with_f7t() -> dict:
-    ''' 
+    '''
         - Name: `get_systems_with_f7t`
-        - Description This function should return a python dictionary of 
+        - Description This function should return a python dictionary of
         `{"system_name":"system_base_dir" }`
         - Params:
           - `None`
@@ -123,8 +123,8 @@ def get_systems_with_f7t() -> dict:
     sys_avail = {} # {"system_name":"system_baswe_dir" }
 
     return sys_avail
-    
-    
+
+
 def submit_job_with_f7t(system_name: str, job_script: str) -> dict:
 
     '''
@@ -135,10 +135,10 @@ def submit_job_with_f7t(system_name: str, job_script: str) -> dict:
         - Params:
           - `system_name`: str
           - `job_script` : str
-        
+
         - Returns:
           - `dict`
-    
+
     '''
 
     return {"job": "Error message", "error": 1}
@@ -155,7 +155,7 @@ def mkdir_with_f7t(system_name: str, target_path: str) -> bool:
       - `target_path`
     - Returns:
       - `bool`
-    
+
     '''
 
     return False
@@ -172,9 +172,9 @@ def mkdir(jobName):
 
     if mkdir_with_f7t(SYSTEM_NAME,targetPath):
         return {"error": 0, "msg": f"Directory {targetPath} created"}
-    
+
     return {"error": 1, "msg":f"Error creating directory {targetPath}"}
-    
+
 
 @app.route("/list_files", methods=["GET"])
 def list_files():
@@ -188,7 +188,7 @@ def list_files():
 
     if files == None:
         return jsonify(rows=[]), 400
-    
+
     return jsonify(rows=files), 200
 
 @app.route("/list_jobs", methods=["GET"])
@@ -212,7 +212,7 @@ def list_jobs():
 
         if len(jobs) == 0:
             return {"rows": [] }
-        
+
         return {"rows": jobs}
 
     except f7t.FirecrestException as fe:
@@ -232,16 +232,16 @@ def results():
 
     try:
 
-        
 
-        
+
+
         resultImage = f"{session['jobDir']}/imag.gif"
         targetPath=f"/app/src/static/{POST_JOB_ID}.gif"
         imgPath = f"/static/{POST_JOB_ID}.gif"
 
         if DEBUG:
             app.logger.debug(f"source_path: {resultImage}")
-            app.logger.debug(f"target_path: {targetPath}")            
+            app.logger.debug(f"target_path: {targetPath}")
 
         dwn = f7t_client.simple_download(machine=SYSTEM_NAME,
                                          source_path=resultImage,
@@ -260,9 +260,9 @@ def results():
         return jsonify(data=f"Download error: {e}"), 400
 
 
-def write_sbatch(jobTemplate, jobName="f7t_test", ntasks=1, account=None, partition=None, 
+def write_sbatch(jobTemplate, jobName="f7t_test", ntasks=1, account=None, partition=None,
                 constraint=None,jobDir=None,step=1,lastJobId=None):
-    
+
     try:
         # sbatch templates directory
         basePath = os.path.abspath(os.path.dirname(__file__))
@@ -298,9 +298,9 @@ def write_sbatch(jobTemplate, jobName="f7t_test", ntasks=1, account=None, partit
             app.logger.info(f"Creating file: {sbatch_file_path}")
 
         with open(sbatch_file_path, "w") as sf:
-            # replace templates variables with values            
+            # replace templates variables with values
             sf.write(jinja_template.render(jobName=jobName, partition=partition, account=account,
-                                     constraint=constraint, lastJobId=lastJobId, ntasks=ntasks, 
+                                     constraint=constraint, lastJobId=lastJobId, ntasks=ntasks,
                                      step=step, jobDir=jobDir))
 
         if DEBUG:
@@ -315,7 +315,7 @@ def write_sbatch(jobTemplate, jobName="f7t_test", ntasks=1, account=None, partit
         if DEBUG:
             app.logger.error(e)
         return {"error": 1, "msg":"Couldn't create sbatch file"}
-        
+
 
     return {"error": 0, "path":sbatch_file_path}
 
@@ -331,60 +331,60 @@ def background_submit_task(steps,jobTemplate,jobName,ntasks,partition,constraint
     lastJobId = 0
     for step in range(1,steps+1):
 
-        if step == 1:     
-            # if this is the first step, then enchained job is not needed       
+        if step == 1:
+            # if this is the first step, then enchained job is not needed
 
             try:
 
                 # write sbatch file using the jobTemplate
 
-                res = write_sbatch(jobTemplate=jobTemplate, jobName=f"{jobName}_{step}",ntasks=ntasks,account=USER_GROUP, partition=partition, 
+                res = write_sbatch(jobTemplate=jobTemplate, jobName=f"{jobName}_{step}",ntasks=ntasks,account=USER_GROUP, partition=partition,
                         constraint=constraint, jobDir=targetPath,step=step)
             except Exception as e:
                 app.logger.error(e)
-                
+
                 socketio.emit("error", {"data":f"Error writing sbatch file for {jobName}_{step} ({e}"})
                 # if the first step fails, then return the error to the frontend
                 return {"data": f"Error writing sbatch file for {jobName}_{step} ({e}", "status": 400}
 
         else:
             # step is not the first one
-            try: 
+            try:
                 res = write_sbatch(jobTemplate=jobTemplate,jobName=f"{jobName}_{step}", ntasks=1, account=USER_GROUP, partition=partition,
                             constraint=constraint, jobDir=targetPath,step=step,lastJobId=lastJobId )
             except Exception as e:
                 app.logger.error(e)
-                
+
                 socketio.emit("error", {"data":f"Error writing sbatch file for {jobName}_{step} ({e}"})
                 # if writing the next sbatch fails, then the whole process can't continue
                 return {"data":f"Error writing sbatch file for {jobName}_{step} ({e}", "status": 400}
-                
+
         if res["error"] == 1:
-            
+
             socketio.emit("error", {"data":f"Error writing sbatch file for {jobName}_{step} ({res['msg']}"})
             return {"data":f"Error writing sbatch file for {jobName}_{step} ({res['msg']}", "status": 400}
-        
+
         # if the sbatch writing worked, then continue submitting jobs
         job_script = res["path"]
 
         try:
-            
+
             # so token is refreshed
             job_submitted = submit_job_with_f7t(system_name=SYSTEM_NAME, job_script=job_script)
 
             if job_submitted["error"] == 1:
-                
+
                 socketio.emit("error", {"data":f"Error submitting job {jobName}_{step} ({job_submitted['job']}"})
                 return {"data": f"Error submitting job {jobName}_{step} ({job_submitted['job']}", "status": 400}
-            
+
             job = job_submitted["job"]
 
             socketio.emit("success", {"data":f"Job {jobName}_{step} submitted correctly (jobid: {job['jobid']})"})
 
             if DEBUG:
                 app.logger.debug(f"Job submission data: {job}")
-            
-            
+
+
 
             lastJobId = job["jobid"]
             data = job
@@ -395,10 +395,10 @@ def background_submit_task(steps,jobTemplate,jobName,ntasks,partition,constraint
                 JOB_LIST = {}
             elif isPostProcess:
                 POST_JOB_ID = lastJobId
-                                
+
             if DEBUG:
                 app.logger.debug(f"Job list: {JOB_LIST}")
-            
+
             # JOB_LIST global variable updated: JOB_LIST = {"<jobid>": "<error_boolean>""}
 
             JOB_LIST[job["jobid"]] = job_submitted["error"]
@@ -411,7 +411,7 @@ def background_submit_task(steps,jobTemplate,jobName,ntasks,partition,constraint
             data = f"Job submission error: {fe}"
             status = 400
 
-            return {"data": data, "status": status}       
+            return {"data": data, "status": status}
 
         except Exception as e:
             if DEBUG:
@@ -419,15 +419,15 @@ def background_submit_task(steps,jobTemplate,jobName,ntasks,partition,constraint
 
             data = f"Job submission error: {e}"
             status = 400
-        
+
             return {"data": data, "status": status}
-        
+
     return {"data": "All jobs submitted correctly", "status": 200}
 
 
 @app.route("/submit_job", methods=["POST"])
 def submit_job():
-    
+
     try:
         ntasks = request.form["numberOfNodes"]
     except Exception as e:
@@ -441,7 +441,7 @@ def submit_job():
         if DEBUG:
             app.logger.warning(e)
         jobName = "f7t_test"
-    
+
     try:
         partition = request.form["partition"]
     except Exception as e:
@@ -483,40 +483,40 @@ def submit_job():
     targetPath = f"{SYSTEM_BASE_DIR}/{username}/{PROBLEM_SUBDIR}/{jobName}"
     if DEBUG:
         app.logger.debug(f"targetPath: {targetPath}")
-    
+
     # if it's a postprocess job, add "/post" to the name
     # and change template
     if isPostProcess:
         jobName=f"{jobName}/post"
         jobTemplate = POST_TEMPLATE
-        
+
     else:
         # if it is not a postprocess, a new directory should be created
         res_mkdir = mkdir(jobName=jobName)
         if res_mkdir["error"] != 0:
             return jsonify(data=res_mkdir["msg"]), 400
 
-   
+
     if not isPostProcess:
-        
+
         for fpath in PROBLEM_FILES:
             sourcePath = fpath
 
             try:
-            
+
                 cp_file_inc = f7t_client.copy(SYSTEM_NAME, source_path=sourcePath, target_path=targetPath)
 
             except f7t.FirecrestException as fe:
 
                 return jsonify(data="Error copying initial data"), 400
 
-    
+
     bgtask = threading.Thread(target=background_submit_task,args=(steps,jobTemplate,jobName,ntasks,partition,constraint,targetPath,isPostProcess))
 
     bgtask.start()
 
     session.clear()
-    
+
     session["jobDir"] = targetPath
     session["jobName"] = jobName
     session["partition"] = partition
@@ -528,15 +528,15 @@ def submit_job():
     if DEBUG:
         app.logger.debug("Information about job submission")
         app.logger.debug(f"jobDir: {session['jobDir']}")
-        app.logger.debug(f"jobName: {session['jobName']}")        
-    
+        app.logger.debug(f"jobName: {session['jobName']}")
+
     return jsonify(data="Batch started"), 200
-            
+
 
 @app.before_request
 def before_request():
     g.user = get_username()
-    
+
 
 @app.route("/",methods=["GET","POST"])
 def live():
@@ -544,7 +544,7 @@ def live():
 
     get_systems_with_f7t()
 
-    status = 200 
+    status = 200
     jobPath = f"{SYSTEM_BASE_DIR}/{g.user}/{PROBLEM_SUBDIR}/"
 
     data = {"partitions": SYSTEM_PARTITIONS, "constraints": SYSTEM_CONSTRAINTS, "system": SYSTEM_NAME, "job_dir":jobPath}
@@ -561,7 +561,7 @@ def live():
 
         return render_template("live.html",  data=data, status=status, msg=msg, error=error)
 
-        
+
     return render_template('live.html', data=data, status=status, error=0)
 
 
@@ -581,12 +581,12 @@ if __name__ == '__main__':
     logger.addHandler(logHandler)
 
     USE_SSL = app.config['USE_SSL']
-    SSL_PEM = app.config['SSL_PEM']
-    SSL_KEY = app.config['SSL_KEY']
 
     CLIENT_PORT = app.config["CLIENT_PORT"]
-    
+
     if not USE_SSL:
         socketio.run(app,host='0.0.0.0',port=CLIENT_PORT,allow_unsafe_werkzeug=True)
     else:
+        SSL_PEM = app.config['SSL_PEM']
+        SSL_KEY = app.config['SSL_KEY']
         socketio.run(app,host='0.0.0.0', ssl_context=(SSL_PEM, SSL_KEY), port=CLIENT_PORT)
