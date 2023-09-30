@@ -35,13 +35,17 @@ $ cp config.py.orig config.py
 class DevConfig(Config)
     OIDC_CLIENT_ID = "<CLIENT_ID>" # <--- obtained from oidc-dashboard (handle with care, it is a credential!)
     OIDC_CLIENT_SECRET = "<CLIENT_SECRET>" # <--- obtained from oidc-dashboard (it is a credential!)
-    USER_GROUP="" # <--- obtained from trainers
+    USER_GROUP="class08"
     OIDC_AUTH_BASE_URL = "https://auth.cscs.ch"
     OIDC_AUTH_REALM = "firecrest-clients"    
     FIRECREST_URL="https://firecrest.cscs.ch"
     SYSTEM_NAME="daint"
     
 ```
+
+- For the configuration variables `SBATCH_TEMPLATE` and `POST_TEMPLATE`:
+  - for debugging purposes, use the values `"demo.sh.tmpl"` and `"demo_post.sh.tmpl"`, respectively
+  - for final test purposes, use the values `"cylinder.sh.tmpl"` and `"post_proc.sh.tmpl"`, respectively
 
 
 ## Build and run

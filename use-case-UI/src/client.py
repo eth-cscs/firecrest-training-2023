@@ -56,7 +56,6 @@ try:
     SYSTEM_PARTITIONS = app.config["SYSTEM_PARTITIONS"]
     SYSTEM_CONSTRAINTS = app.config["SYSTEM_CONSTRAINTS"]
     SYSTEM_RESERVATION = app.config["SYSTEM_RESERVATION"]
-    SYSTEM_BASE_DIR = app.config["SYSTEM_BASE_DIR"]
     USER_GROUP = app.config["USER_GROUP"]
 
 
@@ -69,10 +68,11 @@ except KeyError as ke:
     app.logger.error(f"Error in configuration file: {ke}")
 
 
-
+# global variables
 JOB_LIST = {}
 JOB_DIR = None
 POST_JOB_ID = None
+SYSTEM_BASE_DIR = None
 
 authN = f7t.ClientCredentialsAuth(OIDC_CLIENT_ID, OIDC_CLIENT_SECRET, OIDC_AUTH_TOKEN_URL)
 
@@ -111,19 +111,19 @@ def get_username_with_f7t(system_name):
 
     return None
 
-def get_systems_with_f7t() -> dict:
+def get_base_fs_with_f7t(system_name: str) -> str:
     '''
-        - Name: `get_systems_with_f7t`
+        - Name: `get_avail_fs_with_f7t`
         - Description This function should return a python dictionary of
         `{"system_name":"system_base_dir" }` being `system_base_dir` the `mounted` filesystem for the `system_name`
         - Params:
-          - `None`
+          - `system_name: str`
         - Returns:
-          - `dict`
+          - `None`
     '''
-    sys_avail = {} # {"system_name":"system_base_dir" }
+    
 
-    return sys_avail
+    return None
 
 
 def submit_job_with_f7t(system_name: str, job_script: str) -> dict:
@@ -160,6 +160,27 @@ def mkdir_with_f7t(system_name: str, target_path: str) -> bool:
     '''
 
     return False
+
+
+def list_jobs_with_f7t(system_name: str, job_ids: list[int]) -> dict:
+    '''
+    - Name: list_jobs_with_f7t
+    - Description: list queued and passed (completed, cancelled, pending, etc) 
+    in a specific `system_name` and filtered by a specific list of job IDs (`job_ids`)
+
+    If the job_ids list is empty return {"jobs":[], "error": 0}, 
+    otherwise a list of `firecrest.types.JobQueue`
+      
+    - Parameters:
+      - `system_name`: str
+      - `job_ids`: list[int]
+
+    - Returns
+      - dict: {"jobs": firecrest.types.JobQueue | [], "error": int}
+    '''
+
+    
+    return []
 
 def mkdir(jobName):
 
@@ -428,6 +449,8 @@ def background_submit_task(steps,jobTemplate,jobName,ntasks,partition,constraint
 
 @app.route("/submit_job", methods=["POST"])
 def submit_job():
+    
+    global SYSTEM_RESERVATION
 
     try:
         ntasks = request.form["numberOfNodes"]

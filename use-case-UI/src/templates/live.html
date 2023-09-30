@@ -391,7 +391,6 @@
             data-auto-refresh-interval="15"
             data-auto-refresh-status="true"
             data-auto-refresh-silent="false"
-            data-search="true"
             data-row-style="rowStyle"
             data-sort-name="state"
             >
@@ -506,10 +505,13 @@
         <div class="col-lg-4">
 
             <h3>Working directory</h3> <br>
+            Base directory <kbd>{{ data["job_dir"] }}</kbd>
+
             {% if session["jobDir"] is defined %}
-                <pre><b>{{ session["jobDir"] }}</b></pre>
+            Problem directory: <pre><kbd>{{ session["jobDir"] }}</kbd></pre>
             {% else %}
-                <b><i>Not yet defined</i></b>
+            
+            Problem directory: <i>Not yet defined</i>
             {% endif %}
             <table
             id="dir_table"

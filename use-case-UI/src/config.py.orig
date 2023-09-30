@@ -17,7 +17,6 @@ class DevConfig(Config):
     SYSTEM_RESERVATION='firecrest_api'
     USER_GROUP='class08'
     SYSTEM_CONSTRAINTS=['gpu']
-    SYSTEM_BASE_DIR = '/scratch/snx3000'
     PROBLEM_SUBDIR = "f7t_training"
     PROBLEM_FILES = []
     SBATCH_TEMPLATE = "demo.sh.tmpl"

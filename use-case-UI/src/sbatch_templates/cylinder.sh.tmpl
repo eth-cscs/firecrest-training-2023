@@ -5,7 +5,7 @@
 #SBATCH --partition={{ partition }}
 #SBATCH --constraint={{ constraint }}
 #SBATCH --account={{ account }}
-{% if not none(reservation) %}
+{% if reservation is defined %}
 #SBATCH --reservation={{ reservation }}
 {% endif %}
 
