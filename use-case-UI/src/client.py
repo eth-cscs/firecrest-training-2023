@@ -80,6 +80,19 @@ f7t_client = f7t.Firecrest(
     firecrest_url=FIRECREST_URL, authorization=authN
 )
 
+def is_system_avail_f7t(system_name: str) -> bool:
+    '''
+        - Name: `is_system_avail_f7t`
+        - Description:
+           This function should return `True` if the `system_name` is available, otherwise `False`
+        - Params:
+          - `system_name`: str          
+        - Returns:
+          - `bool`
+    '''
+
+    return False
+
 def list_files_with_f7t(system_name: str, target_path: str) -> list:
     '''
         - Name: `list_files_dir`
@@ -569,12 +582,20 @@ def before_request():
 def live():
     '''Function to live dashboard'''
 
-    get_systems_with_f7t()
+    global SYSTEM_BASE_DIR
+    
+    system_status = "undefined"
+    if is_system_avail_f7t(SYSTEM_NAME):
+        system_status = "avail"
+        SYSTEM_BASE_DIR = get_base_fs_with_f7t(SYSTEM_NAME)
+    else:
+        system_status="notavail"
 
     status = 200
     jobPath = f"{SYSTEM_BASE_DIR}/{g.user}/{PROBLEM_SUBDIR}/"
 
-    data = {"partitions": SYSTEM_PARTITIONS, "constraints": SYSTEM_CONSTRAINTS, "system": SYSTEM_NAME, "job_dir":jobPath}
+    data = {"partitions": SYSTEM_PARTITIONS, "constraints": SYSTEM_CONSTRAINTS, 
+            "system": SYSTEM_NAME, "job_dir":jobPath, "system_status": system_status}
 
     if request.method == "POST":
         msg = None
