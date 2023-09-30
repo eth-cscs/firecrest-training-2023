@@ -524,9 +524,9 @@
         <div class="col-lg-4">
 
             <h3>Working directory</h3> <br>
-            Base directory <kbd>{{ data["job_dir"] }}</kbd>
+            Base directory <kbd>{{ data["job_dir"] }}</kbd> <br>
 
-            {% if session["jobDir"] is defined %}
+            {% if session["jobDir"] is defined %} 
             Problem directory: <pre><kbd>{{ session["jobDir"] }}</kbd></pre>
             {% else %}
             
