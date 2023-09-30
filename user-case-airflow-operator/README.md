@@ -12,6 +12,7 @@ Our operator will look something like this
 ```python
 class FirecRESTCustomOperator(BaseOperator):
     def init(self, arg1, arg2, **kwargs):
+        super().__init__(**kwargs)
         self.arg1 = arg1
         self.arg2 = arg2
 
@@ -45,7 +46,7 @@ pip install apache-airflow pyfirecrest
 
 Before launching Airflow, we need to initialize it's database
 ```bash
-export AIRFLOW_HOME=$HOME/airflow-fc-etraining
+export AIRFLOW_HOME=$HOME/airflow-fc-training
 airflow db init
 ```
 Airflow will come with many examples that show up in the dashboard. You can set `load_examples = False` in your `airflow-fc-etraining/airflow.cfg` configuration file to start Airflow with a clean dashboard.
@@ -63,6 +64,25 @@ standalone | Airflow Standalone is for development purposes only. Do not use thi
 ```
 where you can find the username and password to login in the dashboard at http://127.0.0.1:8080.
 
-## Example
+## Hands On
 
-... two parts 
+The file [firecrest_airflow_operators.py](firecrest_airflow_operators.py) has already part of the implementation of the operators writen.
+We invite you to go through the comments in the file and add the missing parts.
+
+For Airflow to see it, the file must be in the `$PYTHONPATH`. You can install it with
+```bash
+cd use-case-airflow-operator
+pip install .
+```
+
+The DAG for this example is defined in the file [airflow-dag.py](airflow-dag.py).
+To see in in the dashboard we must place it in `$AIRFLOW_HOME/dags`:
+```bash
+mkdir $AIRFLOW_HOME/dags
+cp airflow-dag.py $AIRFLOW_HOME/dags
+```
+It will show up in the dashboard with the name `firecrest_example` after a some seconds / refreshing the page.
+
+You can click on it and browse the differen tabs such as *Graph*.
+You can trigger he DAG it by clicking on the *Play* button at the righ hand side of the dashboard next to teh tabs.
+As it is now, the DAG can be executed but it doesn't do any work since all the FirecREST logic is missing.
