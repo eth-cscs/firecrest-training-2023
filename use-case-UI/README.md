@@ -6,8 +6,6 @@ Create a Web UI application on Python (Flask) to interface HCP services at CSCS
 In the repository, the file `src/client.py` provide a number of functions to be completed with pyFirecREST or FirecREST API.
 This functions are the ones that has the `*_with_f7t` prefix.
 
-
-
 Follow the Configuration guide to adapt your client credentials to the app.
 
 ## Prerequisites

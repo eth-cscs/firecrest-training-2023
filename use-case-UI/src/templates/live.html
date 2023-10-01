@@ -10,7 +10,7 @@
     {% block title %}
         <title>FirecREST Live</title>
     {% endblock title %}
-{% endblock head %}
+{% endblock head%}
 
 
 {% block style %}
@@ -149,33 +149,7 @@
 		form.submit();
 	}
 
-    function show_image(){
-
-        $.ajax({
-            type: 'GET',
-            url: '/results',
-                   
-                success: function(data){
-
-                imgURL = data["data"]+"?time="+ new Date().getTime();
-                console.log(data);
-                console.log("URL: "+imgURL);
-
-                $("#result_image").attr("src",imgURL);
-
-                
-            },
     
-            error: function(data){
-                
-                console.error(data.responseJSON["data"]);
-
-              
-            },
-         });
-
-
-    }
 
     
 
@@ -270,7 +244,7 @@
     }
 
     function error_msg(msg){
-        console.log("Writing Success div");
+        console.log("Writing Error div");
 
         $('<div id="error-alert" class="alert alert-error alert-dismissible fade show" role="alert">'+ 
 			 '<strong>Error</strong> '+msg+
@@ -278,8 +252,8 @@
 	 	  '</div>').prependTo("#msg_placeholder");
 
 
-		$("#success-alert").fadeTo(5000, 500).slideUp(500, function(){
-			$("#success-alert").slideUp(500);
+		$("#error-alert").fadeTo(5000, 500).slideUp(500, function(){
+			$("#error-alert").slideUp(500);
 		});
     }
 
@@ -371,25 +345,24 @@
 
 <div class="container-fluid">
     <div class="row">
-        <div class="col-lg-4">
+        <div class="col-lg-auto">
             <h3>Jobs for user <mark>{{ g.user }}</mark> in <mark>{{ data["system"] }}</mark></h3>
         </div>
-        <div class="col-lg-2">
-            {% if data["system_status"] is defined %}
-                {% if data["system_status"] == "avail" %}
-                    <div class="text-success">System available <i class="bi bi-check-square"></i></div>
-                
-                {% elif data["system_status"] == "notavail" %} 
-                    <div class="text-danger">System not available <i class="bi bi-x-square"></i></div>    
-                {% else %} 
-                    <div class="text-warning">FirecREST not working<i class="bi bi-exclamation-square"></i></div>
-                {% endif %}
+       <div class="col-lg-auto">
+                {% if data["system_status"] is defined %}
+                    {% if data["system_status"] == "avail" %}
+                        <span class="badge bg-success">System available <i class="bi bi-check-square"></i></span>
+                    
+                    {% elif data["system_status"] == "notavail" %} 
+                        <span class="badge bg-danger">System not available <i class="bi bi-x-square"></i></span>    
+                    {% else %} 
+                        <span class="badge bg-warning">FirecREST not working<i class="bi bi-exclamation-square"></i></span>
+                    {% endif %}
 
-            {% endif %}
-        </div>
-            
+                {% endif %}
             
         </div>
+        
     </div>
     
 
@@ -527,10 +500,9 @@
             Base directory <kbd>{{ data["job_dir"] }}</kbd> <br>
 
             {% if session["jobDir"] is defined %} 
-            Problem directory: <pre><kbd>{{ session["jobDir"] }}</kbd></pre>
+                Problem directory: <pre><kbd>{{ session["jobDir"] }}</kbd></pre>
             {% else %}
-            
-            Problem directory: <i>Not yet defined</i>
+                Problem directory: <pre><kbd>Not yet defined</kbd></pre>
             {% endif %}
             <table
             id="dir_table"
@@ -563,11 +535,6 @@
         </div>
 
 
-
-
-
-    <!-- <td style="width: 450px; vertical-align: top;"> -->
-
         <div class="col-lg-6">
             <h3>PostProcess</h3> <br>
             <div id="postprocess">
@@ -599,7 +566,6 @@
         
         </div>
     </div>
-<!-- </table> -->
 
 <div id="parent"></div>
 
@@ -631,7 +597,37 @@
     {% if session["activePost"] is defined and session["activePost"] == true %} 
     
         <script>
+            
+            function show_image(){
+
+                $.ajax({
+                    type: 'GET',
+                    url: '/results',
+                        
+                        success: function(data){
+
+                        imgURL = data["data"]+"?time="+ new Date().getTime();
+                        console.log("Show Image Data: "+data);
+                        console.log("URL: "+imgURL);
+
+                        $("#result_image").attr("src",imgURL);
+
+                        
+                    },
+
+                    error: function(data){
+                        
+                        console.error(data.responseJSON["data"]);
+
+                    
+                    },
+                });
+
+
+            }
+
             show_image();
+
 
             setInterval(show_image, 10000);
 

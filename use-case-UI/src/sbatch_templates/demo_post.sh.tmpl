@@ -6,7 +6,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --partition={{ partition }}
 #SBATCH --constraint={{ constraint }}
-{% if reservation is defined %}
+{% if reservation is not none %}
 #SBATCH --reservation={{ reservation }}
 {% endif %}
 

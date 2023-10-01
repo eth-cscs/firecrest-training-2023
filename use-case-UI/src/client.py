@@ -234,30 +234,13 @@ def list_jobs():
     if DEBUG:
         app.logger.debug(f"Job list to query: {list(JOB_LIST.keys())}")
 
-    if len(JOB_LIST) == 0:
-        return {"rows": [] }
+    f7t_jobs = list_jobs_with_f7t(SYSTEM_NAME, list(JOB_LIST.keys()))
 
-    try:
+    if f7t_jobs["error"] == 0:
+        return {"rows": f7t_jobs["jobs"]}
+    
 
-        jobs = f7t_client.poll(SYSTEM_NAME,jobs=list(JOB_LIST.keys()))
-
-        if DEBUG:
-            app.logger.debug(f"Job list to query: {list(JOB_LIST.keys())}")
-            app.logger.debug(f"Jobs result: {jobs}")
-
-        if len(jobs) == 0:
-            return {"rows": [] }
-
-        return {"rows": jobs}
-
-    except f7t.FirecrestException as fe:
-        if DEBUG:
-            app.logger.error(f"Jobs result: {fe}")
-
-        response = "Error"
-        status = 400
-
-    return jsonify(response=response), status
+    return jsonify(response="Error listing jobs"), 400
 
 
 @app.route("/results", methods=["GET"])
@@ -266,9 +249,6 @@ def results():
     global POST_JOB_ID
 
     try:
-
-
-
 
         resultImage = f"{session['jobDir']}/imag.gif"
         targetPath=f"/app/src/static/{POST_JOB_ID}.gif"
@@ -349,6 +329,7 @@ def write_sbatch(jobTemplate, jobName="f7t_test", ntasks=1, account=None, partit
     except Exception as e:
         if DEBUG:
             app.logger.error(e)
+            app.logger.error(type(e))
         return {"error": 1, "msg":"Couldn't create sbatch file"}
 
 
@@ -462,8 +443,15 @@ def background_submit_task(steps,jobTemplate,jobName,ntasks,partition,constraint
 
 @app.route("/submit_job", methods=["POST"])
 def submit_job():
-    
     global SYSTEM_RESERVATION
+
+    reservation = None
+
+    if SYSTEM_RESERVATION != '':
+        reservation = SYSTEM_RESERVATION
+    
+    if DEBUG:
+        app.logger.debug(f"Reservation to use: {reservation}")
 
     try:
         ntasks = request.form["numberOfNodes"]
@@ -549,7 +537,7 @@ def submit_job():
 
 
     bgtask = threading.Thread(target=background_submit_task,
-                              args=(steps,jobTemplate,jobName,ntasks,partition,constraint,SYSTEM_RESERVATION,targetPath,
+                              args=(steps,jobTemplate,jobName,ntasks,partition,constraint,reservation,targetPath,
                                     isPostProcess))
 
     bgtask.start()
@@ -583,7 +571,7 @@ def live():
     '''Function to live dashboard'''
 
     global SYSTEM_BASE_DIR
-    
+
     system_status = "undefined"
     if is_system_avail_f7t(SYSTEM_NAME):
         system_status = "avail"
