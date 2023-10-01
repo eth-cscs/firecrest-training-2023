@@ -2,6 +2,8 @@
 
 ## Slides
 
+- [PDS - FirecREST Training 2023](slides/FirecREST-Training-2023.pdf)
+
 ## Documentation
 
 - [FirecREST API](https://firecrest-api.cscs.ch)
