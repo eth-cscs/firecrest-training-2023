@@ -66,23 +66,33 @@ where you can find the username and password to login in the dashboard at http:/
 
 ## Hands On
 
-The file [firecrest_airflow_operators.py](firecrest_airflow_operators.py) has already part of the implementation of the operators writen.
-We invite you to go through the comments in the file and add the missing parts.
+For this example we want to propose you the following:
+Let's say that we have a simulation that's finding the geometry of new crystal structures and anytime one geometry is produced we would like to trigger a Quantum Espresso calculation to computes certain properties of it. We have defined an Airflow DAG that will the do the job in the file [airflow-dag.py](airflow-dag.py). It's tasks are:
+ - Detect that a new structure has been produced
+ - Upload the sturcture and it's pseudopotential to Piz Daint
+ - Submit a job to Piz Daint to compute the properties
+ - Download the output of the calculation
+ - Log the relevant values from the output on a table
+ - Delete the file with the structurel
 
-For Airflow to see it, the file must be in the `$PYTHONPATH`. You can install it with
-```bash
-cd use-case-airflow-operator
-pip install .
-```
+We have set this processe to be scheduled daily.
 
-The DAG for this example is defined in the file [airflow-dag.py](airflow-dag.py).
-To see in in the dashboard we must place it in `$AIRFLOW_HOME/dags`:
+To see on Airflow's dashboard we must place the file in `$AIRFLOW_HOME/dags`:
 ```bash
 mkdir $AIRFLOW_HOME/dags
 cp airflow-dag.py $AIRFLOW_HOME/dags
 ```
-It will show up in the dashboard with the name `firecrest_example` after a some seconds / refreshing the page.
+It will show up with the name `firecrest_example` after a some seconds / refreshing the page.
 
 You can click on it and browse the differen tabs such as *Graph*.
 You can trigger he DAG it by clicking on the *Play* button at the righ hand side of the dashboard next to teh tabs.
+
+The file [firecrest_airflow_operators.py](firecrest_airflow_operators.py) has already part of the implementation of the operators writen.
 As it is now, the DAG can be executed but it doesn't do any work since all the FirecREST logic is missing.
+We invite you to go through the comments in the file and add the missing parts.
+
+For Airflow to see our module, the file must be in the `$PYTHONPATH`. You can install it with
+```bash
+cd use-case-airflow-operator
+pip install .
+```
