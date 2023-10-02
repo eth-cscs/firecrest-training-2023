@@ -18,7 +18,7 @@ def create_batch_script(repo, constraint, num_nodes=1, account=None, custom_modu
     script += f"""
 
 git clone -b {branch} {repo} firecrest-ci
-cd firecrest-ci
+cd firecrest-ci/use-case-CI-pipeline
 """
 
     if custom_modules:
