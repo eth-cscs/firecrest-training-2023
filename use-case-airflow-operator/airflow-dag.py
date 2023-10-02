@@ -2,7 +2,6 @@
 
 import datetime
 import os
-
 import pendulum
 
 from airflow import DAG
@@ -14,7 +13,7 @@ from firecrest_airflow_operators import (FirecRESTSubmitOperator,
                                          FirecRESTDownloadOperator)
 
 
-workdir =  # the workdir
+workdir =   # absolute path to the directory `use-case-airflow-operator` in the repo
 username =  # the course account (classXXX)
 
 job_script = """#!/bin/bash -l
