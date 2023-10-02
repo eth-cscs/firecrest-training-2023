@@ -25,4 +25,5 @@ if [ $step -eq 1 ]; then
    prev=" solution.pyfrs "
 fi
 sarus run --mount=type=bind,src=$(pwd),dst=/pyfr --workdir=/pyfr ethcscs/pyfr:1.12.0-cuda11.3-mpich3.1.4-ubuntu20.04 pyfr $command -b cuda -p inc_cylinder_2d.pyfrm ${prev} $ini
-cp --force out_${step}0.00.pyfrs solution.pyfrs
+cp --force inc_cylinder_2d_20.00.pyfrs solution.pyfrs
+

@@ -18,7 +18,8 @@ class DevConfig(Config):
     USER_GROUP='class08'
     SYSTEM_CONSTRAINTS=['gpu']
     PROBLEM_SUBDIR = "f7t_training"
-    PROBLEM_FILES = []
+    PROBLEM_INI_FILE = ''
+    PROBLEM_MSH_FILE = ''
     SBATCH_TEMPLATE = "demo.sh.tmpl"
     POST_TEMPLATE = "demo_post.sh.tmpl"
     CLIENT_PORT = 9090

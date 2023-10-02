@@ -1,6 +1,7 @@
 import tempfile
 import os
 import threading
+from typing import Union
 
 from flask import (Flask, g, render_template, request, jsonify, session)
 from flask_socketio import SocketIO, emit
@@ -60,7 +61,8 @@ try:
 
 
     PROBLEM_SUBDIR = app.config["PROBLEM_SUBDIR"]
-    PROBLEM_FILES = app.config["PROBLEM_FILES"]
+    PROBLEM_INI_FILE = app.config["PROBLEM_INI_FILE"]
+    PROBLEM_MSH_FILE = app.config["PROBLEM_MSH_FILE"]
     SBATCH_TEMPLATE = app.config["SBATCH_TEMPLATE"]
     POST_TEMPLATE = app.config["POST_TEMPLATE"]
 
@@ -276,7 +278,7 @@ def results():
 
 
 def write_sbatch(jobTemplate, jobName="f7t_test", ntasks=1, account=None, partition=None,
-                constraint=None,reservation=None,jobDir=None,step=1,lastJobId=None):
+                constraint=None,reservation=None,jobDir=None, problem_ini_file=None, problem_msh_file=None,step=1,lastJobId=None):
 
     try:
         # sbatch templates directory
@@ -315,8 +317,8 @@ def write_sbatch(jobTemplate, jobName="f7t_test", ntasks=1, account=None, partit
         with open(sbatch_file_path, "w") as sf:
             # replace templates variables with values
             sf.write(jinja_template.render(jobName=jobName, partition=partition, account=account,
-                                     constraint=constraint, reservation=reservation, lastJobId=lastJobId, 
-                                     ntasks=ntasks, step=step, jobDir=jobDir))
+                                     constraint=constraint, reservation=reservation, lastJobId=lastJobId, ntasks=ntasks, step=step, 
+                                     jobDir=jobDir, problem_ini_file=problem_ini_file, problem_msh_file=problem_msh_file))
 
         if DEBUG:
             app.logger.info(f"Created file: {sbatch_file_path}")
@@ -339,7 +341,8 @@ def write_sbatch(jobTemplate, jobName="f7t_test", ntasks=1, account=None, partit
 
 
 
-def background_submit_task(steps,jobTemplate,jobName,ntasks,partition,constraint,reservation,targetPath, isPostProcess):
+def background_submit_task(steps,jobTemplate,jobName,ntasks,partition,constraint,reservation,targetPath, 
+                           problem_ini_file, problem_msh_file, isPostProcess):
 
     global JOB_LIST
     global POST_JOB_ID
@@ -355,7 +358,7 @@ def background_submit_task(steps,jobTemplate,jobName,ntasks,partition,constraint
                 # write sbatch file using the jobTemplate
 
                 res = write_sbatch(jobTemplate=jobTemplate, jobName=f"{jobName}_{step}",ntasks=ntasks,account=USER_GROUP, partition=partition,
-                        constraint=constraint, reservation=reservation, jobDir=targetPath,step=step)
+                        constraint=constraint, reservation=reservation, jobDir=targetPath, problem_ini_file=problem_ini_file, problem_msh_file=problem_msh_file, step=step)
             except Exception as e:
                 app.logger.error(e)
 
@@ -367,7 +370,7 @@ def background_submit_task(steps,jobTemplate,jobName,ntasks,partition,constraint
             # step is not the first one
             try:
                 res = write_sbatch(jobTemplate=jobTemplate,jobName=f"{jobName}_{step}", ntasks=1, account=USER_GROUP, partition=partition,
-                            constraint=constraint, reservation=reservation, jobDir=targetPath,step=step,lastJobId=lastJobId )
+                            constraint=constraint, reservation=reservation, jobDir=targetPath, problem_ini_file=problem_ini_file, problem_msh_file=problem_msh_file, step=step,lastJobId=lastJobId )
             except Exception as e:
                 app.logger.error(e)
 
@@ -444,14 +447,26 @@ def background_submit_task(steps,jobTemplate,jobName,ntasks,partition,constraint
 @app.route("/submit_job", methods=["POST"])
 def submit_job():
     global SYSTEM_RESERVATION
+    global PROBLEM_MSH_FILE
+    global PROBLEM_INI_FILE
 
     reservation = None
-
     if SYSTEM_RESERVATION != '':
         reservation = SYSTEM_RESERVATION
-    
     if DEBUG:
         app.logger.debug(f"Reservation to use: {reservation}")
+    
+    problem_ini_file = None
+    if PROBLEM_INI_FILE != '':
+        problem_ini_file = PROBLEM_INI_FILE        
+    if DEBUG:
+        app.logger.debug(f"Problem Ini File to use: {problem_ini_file}")
+
+    problem_msh_file = None
+    if PROBLEM_MSH_FILE != '':
+        problem_msh_file = PROBLEM_MSH_FILE
+    if DEBUG:
+        app.logger.debug(f"Problem Ini File to use: {problem_msh_file}")
 
     try:
         ntasks = request.form["numberOfNodes"]
@@ -512,7 +527,7 @@ def submit_job():
     # if it's a postprocess job, add "/post" to the name
     # and change template
     if isPostProcess:
-        jobName=f"{jobName}/post"
+        jobName=f"{jobName}_post"
         jobTemplate = POST_TEMPLATE
 
     else:
@@ -524,28 +539,69 @@ def submit_job():
 
     if not isPostProcess:
 
-        for fpath in PROBLEM_FILES:
-            sourcePath = fpath
+        for pf_path in [problem_ini_file, problem_msh_file]:
+
+            if pf_path == None:
+                continue
+
+            basePath = os.path.abspath(os.path.dirname(__file__))
+            sourcePath = f"{basePath}/problem_files/{pf_path}"
 
             try:
+                if DEBUG:
+                    app.logger.debug(f"Uploading {sourcePath} to {targetPath}")
 
-                cp_file_inc = f7t_client.copy(SYSTEM_NAME, source_path=sourcePath, target_path=targetPath)
+                upload_file = f7t_client.simple_upload(SYSTEM_NAME,source_path=sourcePath,target_path=targetPath)
 
             except f7t.FirecrestException as fe:
+                app.logger.error(f"Error Uploading {sourcePath} to {targetPath}: {fe}")
 
-                return jsonify(data="Error copying initial data"), 400
+                return jsonify(data="Error uploading initial data"), 400
+    else:
+        # if is postprocess, upload the post_proc.py file
+        basePath = os.path.abspath(os.path.dirname(__file__))
+        sourcePath = f"{basePath}/sbatch_templates/post_proc.py"
+
+        try:
+            
+            app.logger.info(f"Checking if file {targetPath}/post_proc.py exists")
+
+            files = f7t_client.list_files(SYSTEM_NAME,targetPath)
+
+            found = False
+            for f in files:
+                if f["name"] == "post_proc.py":
+                    app.logger.info("File found, skipping uploading")
+                    found = True
+                    break
+
+            if not found:
+                if DEBUG:
+                    app.logger.debug("File not found, uploading")
+                    app.logger.debug(f"Uploading {sourcePath} to {targetPath}")
+            
+                    upload_file = f7t_client.simple_upload(SYSTEM_NAME,source_path=sourcePath,target_path=targetPath)
+            
+                
+
+        except f7t.FirecrestException as fe:
+            app.logger.error(f"Error Uploading {sourcePath} to {targetPath}: {fe}")
+
+            return jsonify(data="Error copying initial data"), 400
+
 
 
     bgtask = threading.Thread(target=background_submit_task,
                               args=(steps,jobTemplate,jobName,ntasks,partition,constraint,reservation,targetPath,
-                                    isPostProcess))
+                                    problem_ini_file, problem_msh_file, isPostProcess))
 
     bgtask.start()
 
     session.clear()
 
     session["jobDir"] = targetPath
-    session["jobName"] = jobName
+    if not isPostProcess:
+        session["jobName"] = jobName
     session["partition"] = partition
     session["constraint"] = constraint
     session["steps"] = steps

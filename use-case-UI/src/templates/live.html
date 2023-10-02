@@ -263,7 +263,7 @@
     function rowStyle(row,index){
 
         if (row.state == "RUNNING"){
-            return{ classes: "table-warning" }
+            return{ classes: "table-primary" }
         }
 
         if (row.state == "PENDING"){
@@ -276,6 +276,10 @@
 
         if (row.state == "COMPLETED"){
             return{ classes: "table-success" }
+        }
+
+        if (row.state == "CANCELLED"){
+            return{ classes: "table-warning" }
         }
 
         return {};

@@ -3,7 +3,8 @@
 ## Goal of the exercise
 
 Create a Web UI application on Python (Flask) to interface HCP services at CSCS
-In the repository, the file `src/client.py` provide a number of functions to be completed with pyFirecREST or FirecREST API.
+
+In this directory, the file `src/client.py` provides a number of functions to be completed with pyFirecREST or FirecREST API.
 This functions are the ones that has the `*_with_f7t` prefix.
 
 Follow the Configuration guide to adapt your client credentials to the app.
@@ -41,9 +42,14 @@ class DevConfig(Config)
     
 ```
 
-- For the configuration variables `SBATCH_TEMPLATE` and `POST_TEMPLATE`:
-  - for debugging purposes, use the values `"demo.sh.tmpl"` and `"demo_post.sh.tmpl"`, respectively
-  - for final test purposes, use the values `"cylinder.sh.tmpl"` and `"post_proc.sh.tmpl"`, respectively
+- For **debugging** purposes, leave the default values in the variables `SBATCH_TEMPLATE`, `PROBLEM_INI_FILE`, `PROBLEM_MSH_FILE`, and `POST_TEMPLATE`.
+- For **testing a "real"** case, use:
+```
+PROBLEM_INI_FILE = 'inc-cylinder.ini'
+PROBLEM_MSH_FILE = 'inc-cylinder.msh'
+SBATCH_TEMPLATE = "cylinder.sh.tmpl"
+POST_TEMPLATE = "post_proc.sh.tmpl"
+```
 
 
 ## Build and run
