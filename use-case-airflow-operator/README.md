@@ -57,10 +57,12 @@ Let's launch Airflow in *standalone* mode (only suitable for developing/testing)
 airflow standalone
 ```
 
-When Airflow starts, it will print the following lines by the end of the initialization message where you can find the username and password to login in the dashboard at http://127.0.0.1:8080:
+When Airflow standalone starts, it creates an admin user and generates credentials to login in the dashboard at http://127.0.0.1:8080.
+You can find them (username and password) by the end of the initialization message.
+It looks like this:
 ```
 standalone | Airflow is ready
-standalone | Login with username: admin  password: HUDEIDRBRVGvhgjde
+standalone | Login with username: admin  password: <password>
 standalone | Airflow Standalone is for development purposes only. Do not use this in production!
 ```
 
@@ -77,7 +79,9 @@ Anytime a geometry is produced we would like a Quantum Espresso calculation to b
  - Delete the file with the structure
 
 We have set this processe to be scheduled daily.
-For this example, we are going to simulate the creation of the structure by coping the file `si.scf.in` to the `structs` directory.
+
+You must edit the [airflow-dag.py](airflow-dag.py) file and set `workdir` as the absolute path to the directory `use-case-airflow-operator` and `username` as your course user name.
+For this example, we are going to simulate the creation of the structure by coping the file `si.scf.in` to the `{workdir}/structs` directory.
 
 To see the DAG on Airflow's dashboard we must copy the file to `$AIRFLOW_HOME/dags`:
 ```bash
