@@ -6,12 +6,13 @@ import firecrest as f7t
 from airflow.models.baseoperator import BaseOperator
 from airflow import AirflowException
 
-# Workaround to run tasks that do http request from the Airflow UI
+
+# Workaround to run tasks that do http request from the Airflow UI on arm64 macs
 # https://github.com/apache/airflow/discussions/24463#discussioncomment-4404542
 # Other discussions on the topic:
 # https://stackoverflow.com/questions/75980623/why-is-my-airflow-hanging-up-if-i-send-a-http-request-inside-a-task
-from _scproxy import _get_proxy_settings
-_get_proxy_settings()
+# from _scproxy import _get_proxy_settings
+# _get_proxy_settings()
 
 
 class FirecRESTBaseOperator(BaseOperator):
