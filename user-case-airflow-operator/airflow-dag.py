@@ -14,8 +14,8 @@ from firecrest_airflow_operators import (FirecRESTSubmitOperator,
                                          FirecRESTDownloadOperator)
 
 
-workdir = "/Users/sarafael/git_/firecrest-training-2023/user-case-airflow-operator/"
-username = "class439"
+workdir =  # the workdir
+username =  # the course account (classXXX)
 
 job_script = """#!/bin/bash -l
 
@@ -27,8 +27,7 @@ job_script = """#!/bin/bash -l
 #SBATCH --cpus-per-task=12
 #SBATCH --constraint=gpu
 #SBATCH --account=class08
-#SBATCH --partition=debug
-##SBATCH --reservation=firecrest_api
+#SBATCH --reservation=firecrest_api
 
 module load daint-gpu
 module load QuantumESPRESSO
