@@ -338,7 +338,45 @@ def write_sbatch(jobTemplate, jobName="f7t_test", ntasks=1, account=None, partit
     return {"error": 0, "path":sbatch_file_path}
 
 
+def background_submit_postproc(jobTemplate,jobName,ntasks,partition,constraint,reservation,targetPath, 
+                           problem_ini_file, problem_msh_file):
+    
+    global JOB_LIST
+    global POST_JOB_ID
+    
+    try:
 
+        # write sbatch file using the jobTemplate
+
+        res = write_sbatch(jobTemplate=jobTemplate, jobName=f"{jobName}_post",ntasks=ntasks,account=USER_GROUP, partition=partition,
+                constraint=constraint, reservation=reservation, jobDir=targetPath, problem_ini_file=problem_ini_file, problem_msh_file=problem_msh_file)
+    except Exception as e:
+        app.logger.error(e)
+
+        socketio.emit("error", {"data":f"Error writing sbatch file for {jobName}_post ({e}"})
+        # if the first step fails, then return the error to the frontend
+        return {"data": f"Error writing sbatch file for {jobName}_post ({e}", "status": 400}
+    
+    # if the sbatch writing worked, then continue submitting jobs
+    job_script = res["path"]
+    job_submitted = submit_job_with_f7t(system_name=SYSTEM_NAME, job_script=job_script)
+
+    if job_submitted["error"] == 1:
+
+        socketio.emit("error", {"data":f"Error submitting job {jobName}_post ({job_submitted['job']}"})
+        return {"data": f"Error submitting job {jobName}_post ({job_submitted['job']}", "status": 400}
+
+    job = job_submitted["job"]
+
+    socketio.emit("success", {"data":f"Job {jobName}_post submitted correctly (jobid: {job['jobid']})"})
+
+    POST_JOB_ID = job["jobid"]
+    JOB_LIST[job["jobid"]] = job_submitted["error"]
+
+    if DEBUG:
+        app.logger.debug(f"Job submission data: {job}")
+    
+    return {"data": "Postprocess job submitted correctly", "status": 200}
 
 
 def background_submit_task(steps,jobTemplate,jobName,ntasks,partition,constraint,reservation,targetPath, 
@@ -348,6 +386,7 @@ def background_submit_task(steps,jobTemplate,jobName,ntasks,partition,constraint
     global POST_JOB_ID
 
     lastJobId = 0
+
     for step in range(1,steps+1):
 
         if step == 1:
@@ -527,7 +566,7 @@ def submit_job():
     # if it's a postprocess job, add "/post" to the name
     # and change template
     if isPostProcess:
-        jobName=f"{jobName}_post"
+        # jobName=f"{jobName}_post"
         jobTemplate = POST_TEMPLATE
 
     else:
@@ -582,16 +621,18 @@ def submit_job():
             
                     upload_file = f7t_client.simple_upload(SYSTEM_NAME,source_path=sourcePath,target_path=targetPath)
             
-                
-
+            
         except f7t.FirecrestException as fe:
             app.logger.error(f"Error Uploading {sourcePath} to {targetPath}: {fe}")
 
             return jsonify(data="Error copying initial data"), 400
 
-
-
-    bgtask = threading.Thread(target=background_submit_task,
+    if isPostProcess:
+        bgtask = threading.Thread(target=background_submit_postproc,
+                              args=(jobTemplate,jobName,ntasks,partition,constraint,reservation,targetPath,
+                                    problem_ini_file, problem_msh_file))  
+    else:
+        bgtask = threading.Thread(target=background_submit_task,
                               args=(steps,jobTemplate,jobName,ntasks,partition,constraint,reservation,targetPath,
                                     problem_ini_file, problem_msh_file, isPostProcess))
 
@@ -600,8 +641,7 @@ def submit_job():
     session.clear()
 
     session["jobDir"] = targetPath
-    if not isPostProcess:
-        session["jobName"] = jobName
+    session["jobName"] = jobName
     session["partition"] = partition
     session["constraint"] = constraint
     session["steps"] = steps
