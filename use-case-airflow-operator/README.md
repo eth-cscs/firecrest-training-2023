@@ -91,7 +91,7 @@ cp airflow-dag.py $AIRFLOW_HOME/dags
 It will show up with the name `firecrest_example` after some seconds / refreshing the page.
 
 You can click on it and browse the different tabs such as *Graph*.
-The execution of the DAG can be triggered by clicking on the *Play* button at the righ hand side of the dashboard next to the tabs.
+The execution of the DAG can be triggered by clicking on the *Play* button at the right hand side of the dashboard next to the tabs.
 
 The file [firecrest_airflow_operators.py](firecrest_airflow_operators.py) has already part of the implementation of the operators written.
 As it is now, the DAG can be executed but it doesn't do any work since all the FirecREST logic is missing.
