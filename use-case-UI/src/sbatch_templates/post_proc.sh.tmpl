@@ -6,6 +6,8 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --partition={{ partition }}
 #SBATCH --constraint={{ constraint }}
+#SBATCH --error=slurm-{{ jobName }}-%j.err
+#SBATCH --output=slurm-{{ jobName }}-%j.out
 {% if reservation is not none %}
 #SBATCH --reservation={{ reservation }}
 {% endif %}
@@ -26,7 +28,7 @@ for a in *.pyfrs; do
      if [ ! -s $name.vtu ]; then
          echo $name
          # export .pyfrs to .vtu
-         sarus run --mount=type=bind,src=$(pwd),dst=/pyfr --workdir=/pyfr ethcscs/pyfr:1.12.0-cuda11.3-mpich3.1.4-ubuntu20.04 pyfr export inc_cylinder_2d.pyfrm $a ${name}.vtu
+         sarus run --mount=type=bind,src=$(pwd),dst=/pyfr --workdir=/pyfr ethcscs/pyfr:1.12.0-cuda11.3-mpich3.1.4-ubuntu20.04 pyfr export inc-cylinder.pyfrm $a ${name}.vtu
      fi
   fi
 done
