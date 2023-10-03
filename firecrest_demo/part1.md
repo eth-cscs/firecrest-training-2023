@@ -1,4 +1,4 @@
-# Basic usage of FirecREST
+# Basic usage of FirecREST through the API directly
 
 ## HTTP requests
 
@@ -143,73 +143,48 @@ We should get some response like this:
 }
 ```
 
-## How to use pyfirecrest
+## Interracting with the scheduler
 
-### Setting up the authentication
+FirecREST offers three basic functionalities of the scheduler:
+1. submit jobs on behalf of a user,
+1. poll for the jobs of the user and
+1. cancel jobs.
 
-You can take care of the access token by yourself any way you want, or even better use a library to take care of this for you, depending on the **grant type** of your client. What pyFirecREST will need in the end is only a python object with the method `get_access_token()`, that when called will provide a valid access token.
+## The `compute` workflow
 
-Let’s say for example you have somehow obtained a long-lasting access token. The Authorization class you would need to make and give to Firecrest would look like this:
+See the workflow [here](compute_sbatch.pdf).
 
-```python
-class MyAuthorizationClass:
-    def __init__(self):
-        pass
+On a job scheduler like Slurm, every job has a unique `job ID`, which is created when a job is submitted and can be used to track the state of the job. With calls like `squeue` and `sacct` the user can see the state of the job (RUNNING, COMPLETED, etc.) as well as get information for the job.
+Similarly, for every task FirecREST will assign a `task ID` with which the user can track the state of the request and get information about it.
 
-    def get_access_token(self):
-        return <TOKEN>
-```
-
-If you want to use the `Client Credentials` authorization grant, you can use the `ClientCredentialsAuth` class from pyFirecREST and setup the authorization object like this:
+## Implement the job submission with direct calls to the api:
 
 ```python
-import firecrest as f7t
+localPath = 'script.sh'
 
-keycloak = f7t.ClientCredentialsAuth(
-    <client_id>, <client_secret>, <token_uri>
-)
-```
-
-The `ClientCredentialsAuth` object will try to make the minimum requests that are necessary by reusing the access token while it is valid. More info on parameterizing it in the [docs]().
-
-
-### Example of calls with pyfirecrest
-
-Your starting point to use pyFirecREST will be the creation of a `FirecREST` object. This is simply a mini client that, in cooperation with the authorization object, will take care of the necessary requests that need to be made and handle the responses.
-
-```python
-import firecrest as f7t
-import os
-
-
-# Get the values from the env or set them directly in your file
-CLIENT_ID = os.environ.get("FIRECREST_CLIENT_ID")
-CLIENT_SECRET = os.environ.get("FIRECREST_CLIENT_SECRET")
-AUTH_TOKEN_URL = os.environ.get("AUTH_TOKEN_URL")
-FIRECREST_URL = os.environ.get("FIRECREST_URL")
-
-# Setup the auth object
-auth = f7t.ClientCredentialsAuth(
-    CLIENT_ID, CLIENT_SECRET, AUTH_TOKEN_URL
+response = requests.post(
+    url=f'{FIRECREST_URL}/compute/jobs/upload',
+    headers={'Authorization': f'Bearer {TOKEN}',
+             'X-Machine-Name': "daint"},
+    files={'file': open(localPath, 'rb')}
 )
 
-# Setup the client object
-client = f7t.Firecrest(
-    firecrest_url=FIRECREST_URL,
-    authorization=auth
-)
+print(json.dumps(response.json(), indent=4))
 
-# After this setup, you can go on and try some of the methods of the object
+taskid = response.json()['task_id']
 
+while True:
+    response = requests.get(
+        url=f'{FIRECREST_URL}/tasks/{taskid}',
+        headers={'Authorization': f'Bearer {TOKEN}'}
+    )
 
-systems = client.all_systems()
-print(systems)
+    print(json.dumps(response.json(), indent=4))
 
-## Exercise:
+    if int(response.json()["task"]["status"]) < 200:
+        continue
 
-# 1. Get tha different parameters of our deployment
-# 2. Get the username of the user
-# 3. List all microservices and their status
-# 4. List the contents of a directory
-# 5. Upload and download "small" files
+    break
+
+print(json.dumps(response.json()["task"]["data"], indent=4))
 ```
