@@ -45,7 +45,7 @@ client.submit("daint", "script.sh")
 localPath = 'script.sh'
 
 response = requests.post(
-    url=f'{FIRECREST_IP}/compute/jobs/upload',
+    url=f'{FIRECREST_URL}/compute/jobs/upload',
     headers={'Authorization': f'Bearer {TOKEN}',
              'X-Machine-Name': "daint"},
     files={'file': open(localPath, 'rb')}
@@ -57,16 +57,18 @@ taskid = response.json()['task_id']
 
 while True:
     response = requests.get(
-        url=f'{FIRECREST_IP}/tasks/{taskid}',
+        url=f'{FIRECREST_URL}/tasks/{taskid}',
         headers={'Authorization': f'Bearer {TOKEN}'}
     )
 
     print(json.dumps(response.json(), indent=4))
 
-    if response.json()["status"] < 200:
+    if int(response.json()["task"]["status"]) < 200:
         continue
 
     break
+
+print(json.dumps(response.json()["task"]["data"], indent=4))
 ```
 
 ## The storage workflow

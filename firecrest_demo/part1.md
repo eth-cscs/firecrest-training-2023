@@ -70,7 +70,7 @@ response = requests.post(
 )
 
 print(f"Status code: {response.status_code}")
-print(f"Hheaders:\n{json.dumps(dict(response.headers), indent=4)}")
+print(f"Headers:\n{json.dumps(dict(response.headers), indent=4)}")
 print(f"JSON:\n{json.dumps(response.json(), indent=4)}")
 ```
 
@@ -103,7 +103,7 @@ decoded = jwt.decode(
     response.json()["access_token"],
     options={"verify_signature": False},
 )
-print(decoded)
+print("Decoded token:", json.dumps(decoded, indent=4))
 ```
 
 ## Making our first request to the API
