@@ -1,6 +1,6 @@
-# More advanced cases
+# More advanced cases of pyfirecrest
 
-## Enable logging in your python code
+## Enable logging in your python code
 
 The simplest way to enable logging in your code would be to add this in the beginning of your file:
 
@@ -101,7 +101,7 @@ systems = await client.all_systems()
 print(systems)
 
 # Getting the files of a directory
-files = await client.list_files("daint", "/home/test_user")
+files = await client.list_files("daint", "/scatch/scratch3000/test_user")
 print(files)
 
 # Submit a job
