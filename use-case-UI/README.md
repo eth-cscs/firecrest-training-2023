@@ -3,8 +3,8 @@
 ## Goal of the exercise
 
 Create a Web UI application on Python (Flask) to interface HCP services at CSCS
-In the repository, the file `src/client.py` provide a number of functions to be completed with pyFirecREST or FirecREST API.
-This functions are the ones that has the `*_with_f7t` prefix.
+In the repository, the file `src/client.py` provides a number of functions to be completed with pyFirecREST or FirecREST API.
+These functions are the ones that have the `*_with_f7t` prefix.
 
 Follow the Configuration guide to adapt your client credentials to the app.
 
@@ -26,7 +26,7 @@ $ cd src
 $ cp config.py.orig config.py
 ```
 
-2. Replace the follwing values with the specifics for this training 
+2. Replace the following values with the specifics for this training 
 
 ```
 ...
