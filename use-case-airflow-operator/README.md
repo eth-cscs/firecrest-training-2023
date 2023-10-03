@@ -40,7 +40,7 @@ You just need to do the following:
 ```bash
 python -m venv fc-training-env
 . fc-training-env/bin/activate
-pip install apache-airflow pyfirecrest
+pip install apache-airflow==2.7.1 pyfirecrest werkzeug==2.2.3
 ```
 
 ### Launching Airflow
