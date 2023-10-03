@@ -19,15 +19,23 @@ client = f7t.Firecrest(
     authorization=auth
 )
 
-systems = client.all_systems()
-print(systems)
+# This call will only start the transfer of the file to the staging area
+down_obj = client.external_download("daint", "/scratch/snx3000/eirinik/a_file.txt")
 
-## Exercise:
+print(type(down_obj))
 
-# 1. Get tha different parameters of our deployment
-# 2. Get the username of the user
-# 3. List all microservices and their status
-# 4. List the contents of a directory
-# 5. Upload and download "small" files
-# 6. Submit a job
-# 7. [Optional] Submit a job and poll until the it is finished
+# You can follow the progress of the transfer through the status property
+print(down_obj.status)
+
+# As soon as down_obj.status is 117 we can proceed with the download to a local file
+down_obj.finish_download("my_local_file")
+
+print(down_obj.status)
+
+# You can get directly the link in the staging area and finish the download in your prefered way.
+print("Direct link:", down_obj.object_storage_link)
+
+# You can download the file as many times as we want from the staging area.
+# After you finish, you should invalidate the link.
+down_obj.invalidate_object_storage_link()
+
