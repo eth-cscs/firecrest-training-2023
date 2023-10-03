@@ -6,9 +6,10 @@
 - In order to follow the `pyfirecrest` part of the demo you will need `Python>=3.7` and to install pyfirecrest in your local env.
 
 ```bash
+cd firecrest-demo
 python -m venv pyfirecrest-demo-env
 . pyfirecrest-demo-env/bin/activate
-python -m pip install pyfirecrest
+python -m pip install -r requirements.txt
 ```
 
 Setup environment with credentials and the necessary URLs:
