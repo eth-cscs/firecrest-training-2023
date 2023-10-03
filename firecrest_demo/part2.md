@@ -7,7 +7,7 @@ FirecREST offers three basic functionalities of the scheduler:
 
 ## The `compute` workflow
 
-See the workflow [here](https://firecrest.readthedocs.io/en/latest/tutorial.html#submit-a-job).
+See the workflow [here](compute_sbatch.pdf).
 
 On a job scheduler like Slurm, every job has a unique `job ID`, which is created when a job is submitted and can be used to track the state of the job. With calls like `squeue` and `sacct` the user can see the state of the job (RUNNING, COMPLETED, etc.) as well as get information for the job.
 Similarly, for every task FirecREST will assign a `task ID` with which the user can track the state of the request and get information about it.
@@ -74,7 +74,7 @@ while True:
 For larger files the user cannot directly upload/download a file to/from FirecREST.
 A staging area will be used and the process will require multiple requests from the user.
 
-See the workflow [here](https://firecrest.readthedocs.io/en/latest/tutorial.html#upload-with-non-blocking-call-something-bigger).
+More about the [external download](external_download.pdf) and [external upload](external_upload.pdf) workflows in the links.
 
 ## External upload with pyfirecrest
 
