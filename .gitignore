@@ -2,3 +2,5 @@ __pycache__/
 *venv/
 *.pyc
 *.log
+use-case-UI/src/client_solved.py
+use-case-UI/src/config.py
